@@ -9,11 +9,7 @@ let db;
 
 async function connectDB() {
   try {
-    client = new MongoClient(uri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-
+    client = new MongoClient(uri);
     await client.connect();
     db = client.db(dbName);
 
