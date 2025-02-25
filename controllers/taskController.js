@@ -54,14 +54,14 @@ async function getTask(req, res) {
 // Update tugas
 async function editTask(req, res) {
     try {
-        const { title, category, deadline } = req.body;
-        const updated = await updateTask(req.params.id, { title, category, deadline });
+        const { title, category, deadline, status } = req.body;
+        const updated = await updateTask(req.params.id, { title, category, deadline, status });
 
         if (!updated) {
             return res.status(404).json({ message: "Tugas tidak ditemukan!" });
         }
 
-        broadcast({ type: "EDIT_TASK", data: { _id: req.params.id, title, category, deadline } });
+        broadcast({ type: "EDIT_TASK", data: { _id: req.params.id, title, category, deadline, status } });
         res.json({ message: "Tugas berhasil diperbarui!" });
     } catch (err) {
         res.status(500).json({ message: "Gagal memperbarui tugas!" });

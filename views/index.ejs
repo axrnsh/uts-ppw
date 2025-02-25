@@ -172,6 +172,9 @@
 
                 const response = await fetch(url, { method: "GET", credentials: "include" });
                 const tasks = await response.json();
+
+                tasks.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+
                 $("#taskTable").empty();
 
                 if (tasks.length === 0) {
@@ -184,7 +187,7 @@
                         <td>${index + 1}</td>
                         <td>${task.title}</td>
                         <td>${task.category}</td>
-                        <td>${task.deadline}</td>
+                        <td>${formatDate(task.deadline)}</td>
                         <td>${task.status}</td>
                         <td>
                             <button class="btn btn-light btn-sm editTaskBtn" data-id="${task._id}">
@@ -202,6 +205,16 @@
                 console.error("Gagal mengambil tugas:", error);
             }
         }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString("id-ID", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+            });
+        }
+
 
         $("#addTaskBtn").click(async () => {
             const title = $("#taskTitle").val();
@@ -386,7 +399,7 @@
         $(document).ready(() => {
             fetchTasks();
         });
-        
+
         const socket = new WebSocket(`ws://${window.location.hostname}:5000`);
 
         socket.onmessage = function (event) {
