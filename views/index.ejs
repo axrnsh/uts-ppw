@@ -262,7 +262,7 @@
 
                 fetchTasks();
             } catch (error) {
-                alert(error.message);
+                console.error(error);
             }
         });
 
@@ -290,7 +290,6 @@
                 $("#editTaskModal").modal("show");
             } catch (error) {
                 console.error("Gagal mengambil tugas:", error);
-                alert(error.message);
             }
         });
 
@@ -337,7 +336,6 @@
                 fetchTasks();
             } catch (error) {
                 console.error("Gagal mengupdate tugas:", error);
-                alert(error.message);
             }
         });
 
@@ -379,7 +377,6 @@
                 fetchTasks();
             } catch (error) {
                 console.error("Gagal menghapus tugas:", error);
-                alert(error.message);
             }
         });
 
