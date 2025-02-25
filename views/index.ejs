@@ -34,29 +34,39 @@
             </h3>
         </div>
 
-        <div class="mb-3">
-            <select id="categoryFilter" class="form-select">
-                <option value="">Semua</option>
+        <div class="mb-3 d-flex gap-2">
+            <select id="categoryFilter" class="form-select w-50">
+                <option value="">Semua Kategori</option>
                 <option value="Kuliah">Kuliah</option>
                 <option value="Organisasi">Organisasi</option>
                 <option value="Pribadi">Pribadi</option>
             </select>
+
+            <select id="statusFilter" class="form-select w-50">
+                <option value="">Semua Status</option>
+                <option value="Selesai">Selesai</option>
+                <option value="Belum Selesai">Belum Selesai</option>
+            </select>
         </div>
 
         <div class="table-responsive">
-            <table class="table table-bordered table-hover">
+            <table class="table table-bordered table-hover text-center">
                 <thead class="table-dark">
                     <tr>
-                        <th>#</th>
+                        <th style="width: 50px;">No</th>
                         <th>Judul</th>
-                        <th>Kategori</th>
-                        <th>Deadline</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
+                        <th style="width: 200px;">Kategori</th>
+                        <th style="width: 150px;">Deadline</th>
+                        <th style="width: 200px;">Status</th>
+                        <th style="width: 100px;"></th>
                     </tr>
                 </thead>
                 <tbody id="taskTable"></tbody>
             </table>
+        </div>
+
+        <div id="noDataMessage" class="text-center text-muted mt-3" style="display: none;">
+            <i class="bi bi-info-circle"></i> Tidak ada data.
         </div>
     </main>
 
@@ -140,44 +150,56 @@
     </div>
 
     <script>
-        async function fetchTasks(category = "") {
+        $("#categoryFilter, #statusFilter").change(() => {
+            const selectedCategory = $("#categoryFilter").val();
+            const selectedStatus = $("#statusFilter").val();
+            fetchTasks(selectedCategory, selectedStatus);
+        });
+
+        async function fetchTasks(category = "", status = "") {
             try {
                 let url = "/tasks";
-                if (category) {
-                    url += `?category=${category}`;
+                let params = [];
+
+                if (category) params.push(`category=${category}`);
+                if (status) params.push(`status=${status}`);
+
+                if (params.length > 0) {
+                    url += "?" + params.join("&");
                 }
 
                 const response = await fetch(url, { method: "GET", credentials: "include" });
                 const tasks = await response.json();
                 $("#taskTable").empty();
 
-                tasks.forEach((task, index) => {
-                    $("#taskTable").append(`
-                        <tr>
-                            <td>${index + 1}</td>
-                            <td>${task.title}</td>
-                            <td>${task.category}</td>
-                            <td>${task.deadline}</td>
-                            <td>${task.status}</td>
-                            <td>
-                                <button class="btn btn-light btn-sm editTaskBtn" data-id="${task._id}">
-                                    <i class="bi bi-pencil-square"></i>
-                                </button>
-                                <button class="btn btn-light btn-sm deleteTaskBtn" data-id="${task._id}">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    `);
-                });
+                if (tasks.length === 0) {
+                    $("#noDataMessage").show();
+                } else {
+                    $("#noDataMessage").hide();
+                    tasks.forEach((task, index) => {
+                        $("#taskTable").append(`
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${task.title}</td>
+                        <td>${task.category}</td>
+                        <td>${task.deadline}</td>
+                        <td>${task.status}</td>
+                        <td>
+                            <button class="btn btn-light btn-sm editTaskBtn" data-id="${task._id}">
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
+                            <button class="btn btn-light btn-sm deleteTaskBtn" data-id="${task._id}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `);
+                    });
+                }
             } catch (error) {
                 console.error("Gagal mengambil tugas:", error);
             }
         }
-
-        $("#categoryFilter").change(() => {
-            fetchTasks($("#categoryFilter").val());
-        });
 
         $("#addTaskBtn").click(async () => {
             const title = $("#taskTitle").val();

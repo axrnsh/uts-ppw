@@ -7,9 +7,9 @@ async function createTask(taskData) {
   return result.insertedId;
 }
 
-async function getAllTasks() {
+async function getAllTasks(filter = {}) {
   const db = getDB();
-  return await db.collection("tasks").find().toArray();
+  return await db.collection("tasks").find(filter).toArray();
 }
 
 async function getTaskById(id) {

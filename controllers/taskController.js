@@ -13,12 +13,24 @@ async function addTask(req, res) {
 // Ambil semua tugas
 async function getTasks(req, res) {
     try {
-        const tasks = await getAllTasks();
+        const { category, status } = req.query;
+        let filter = {};
+
+        if (category) {
+            filter.category = category;
+        }
+
+        if (status) {
+            filter.status = status;
+        }
+
+        const tasks = await getAllTasks(filter);
         res.json(tasks);
     } catch (err) {
         res.status(500).json({ message: "Gagal mengambil tugas!" });
     }
 }
+
 
 // Ambil tugas berdasarkan ID
 async function getTask(req, res) {
