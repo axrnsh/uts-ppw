@@ -4,7 +4,7 @@ const { connectDB, closeDB } = require("./config/database");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const http = require("http");
-const { webSocket } = require("./public/websocket");
+const { webSocket } = require("./websocket");
 
 const authRoutes = require("./routes/authRoutes");
 const taskRoutes = require("./routes/taskRoutes");
@@ -27,7 +27,7 @@ app.use("/tasks", taskRoutes);
 app.use("/", viewRoutes);
 
 const server = http.createServer(app);
-web(server);
+webSocket(server);
 
 connectDB().then(() => {
   server.listen(PORT, () => {
