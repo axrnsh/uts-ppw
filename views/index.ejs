@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Tugas</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+
+<body class="d-flex bg-light text-dark">
+    <!-- Sidebar -->
+    <aside class="d-flex flex-column p-3 text-white bg-white position-fixed shadow"
+        style="width: 250px; height: 100vh;">
+        <div class="d-flex flex-column justify-content-center align-items-center flex-grow-1">
+            <img src="https://i.imgur.com/xsP5nq7.png" alt="User Image" class="img-fluid" style="width: 200px;">
+            <button class="btn btn-dark w-100 shadow-sm fw-bold mt-3 text-white" data-bs-toggle="modal"
+                data-bs-target="#addTaskModal">
+                <i class="bi bi-plus-circle"></i> Tambah Tugas
+            </button>
+        </div>
+
+        <button id="logoutBtn" class="btn btn-light w-100 shadow-sm fw-bold mt-3">Logout</button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="p-4" style="margin-left: 250px; width: calc(100% - 250px);">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="fw-bold d-flex align-items-center">
+                <i class="bi bi-list-task me-2 mt-1"></i> Daftar Tugas
+            </h3>
+        </div>
+
+        <div class="mb-3">
+            <select id="categoryFilter" class="form-select">
+                <option value="">Semua</option>
+                <option value="Kuliah">Kuliah</option>
+                <option value="Organisasi">Organisasi</option>
+                <option value="Pribadi">Pribadi</option>
+            </select>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Judul</th>
+                        <th>Kategori</th>
+                        <th>Deadline</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="taskTable"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Modal Tambah Tugas -->
+    <div class="modal fade" id="addTaskModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Tambah Tugas</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="taskTitle" class="form-control mb-3" placeholder="Judul Tugas" required>
+                    <select id="taskCategory" class="form-select mb-3">
+                        <option value="Kuliah">Kuliah</option>
+                        <option value="Organisasi">Organisasi</option>
+                        <option value="Pribadi">Pribadi</option>
+                    </select>
+                    <input type="date" id="taskDeadline" class="form-control mb-3">
+                    <select id="taskStatus" class="form-select">
+                        <option value="Belum Selesai">Belum Selesai</option>
+                        <option value="Selesai">Selesai</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                    <button class="btn btn-secondary" id="addTaskBtn">Tambah</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Edit Tugas -->
+    <div class="modal fade" id="editTaskModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Tugas</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="editTaskId">
+                    <input type="text" id="editTaskTitle" class="form-control mb-3" placeholder="Judul Tugas" required>
+                    <select id="editTaskCategory" class="form-select mb-3">
+                        <option value="Kuliah">Kuliah</option>
+                        <option value="Organisasi">Organisasi</option>
+                        <option value="Pribadi">Pribadi</option>
+                    </select>
+                    <input type="date" id="editTaskDeadline" class="form-control mb-3">
+                    <select id="editTaskStatus" class="form-select">
+                        <option value="Belum Selesai">Belum Selesai</option>
+                        <option value="Selesai">Selesai</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                    <button class="btn btn-secondary" id="editTaskBtn">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Konfirmasi Hapus -->
+    <div class="modal fade" id="deleteTaskModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Konfirmasi Hapus</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Apakah Anda yakin ingin menghapus tugas ini?</p>
+                    <input type="hidden" id="deleteTaskId">
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                    <button class="btn btn-secondary" id="confirmDeleteBtn">Hapus</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function fetchTasks(category = "") {
+            try {
+                let url = "/tasks";
+                if (category) {
+                    url += `?category=${category}`;
+                }
+
+                const response = await fetch(url, { method: "GET", credentials: "include" });
+                const tasks = await response.json();
+                $("#taskTable").empty();
+
+                tasks.forEach((task, index) => {
+                    $("#taskTable").append(`
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${task.title}</td>
+                            <td>${task.category}</td>
+                            <td>${task.deadline}</td>
+                            <td>${task.status}</td>
+                            <td>
+                                <button class="btn btn-light btn-sm editTaskBtn" data-id="${task._id}">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+                                <button class="btn btn-light btn-sm deleteTaskBtn" data-id="${task._id}">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `);
+                });
+            } catch (error) {
+                console.error("Gagal mengambil tugas:", error);
+            }
+        }
+
+        $("#categoryFilter").change(() => {
+            fetchTasks($("#categoryFilter").val());
+        });
+
+        $("#addTaskBtn").click(async () => {
+            const title = $("#taskTitle").val();
+            const category = $("#taskCategory").val();
+            const deadline = $("#taskDeadline").val();
+            const status = $("#taskStatus").val();
+
+            if (!title || !category || !deadline || !status) {
+                alert("Harap isi semua field!");
+                return;
+            }
+
+            const token = document.cookie
+                .split("; ")
+                .find(row => row.startsWith("token="))
+                ?.split("=")[1];
+
+            if (!token) {
+                alert("Token tidak ditemukan! Silakan login ulang.");
+                window.location.href = "/login";
+                return;
+            }
+
+            try {
+                const response = await fetch("/tasks", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ title, category, deadline, status }),
+                    credentials: "include"
+                });
+
+                if (!response.ok) {
+                    const errorResponse = await response.json();
+                    throw new Error(errorResponse.message || "Gagal menambahkan tugas.");
+                }
+
+                $("#addTaskModal").modal("hide");
+                $("#taskTitle").val("");
+                $("#taskCategory").val("Kuliah");
+                $("#taskDeadline").val("");
+                $("#taskStatus").val("Belum Selesai");
+
+                fetchTasks();
+            } catch (error) {
+                alert(error.message);
+            }
+        });
+
+        $(document).on("click", ".editTaskBtn", async function () {
+            const taskId = $(this).data("id");
+
+            try {
+                const response = await fetch(`/tasks/${taskId}`, {
+                    method: "GET",
+                    credentials: "include",
+                });
+
+                if (!response.ok) {
+                    throw new Error("Gagal mengambil data tugas.");
+                }
+
+                const task = await response.json();
+
+                $("#editTaskId").val(taskId);
+                $("#editTaskTitle").val(task.title);
+                $("#editTaskCategory").val(task.category);
+                $("#editTaskDeadline").val(task.deadline);
+                $("#editTaskStatus").val(task.status);
+
+                $("#editTaskModal").modal("show");
+            } catch (error) {
+                console.error("Gagal mengambil tugas:", error);
+                alert(error.message);
+            }
+        });
+
+        $("#editTaskBtn").click(async () => {
+            const taskId = $("#editTaskId").val();
+            const title = $("#editTaskTitle").val();
+            const category = $("#editTaskCategory").val();
+            const deadline = $("#editTaskDeadline").val();
+            const status = $("#editTaskStatus").val();
+
+            if (!title || !category || !deadline || !status) {
+                alert("Harap isi semua field!");
+                return;
+            }
+
+            const token = document.cookie
+                .split("; ")
+                .find(row => row.startsWith("token="))
+                ?.split("=")[1];
+
+            if (!token) {
+                alert("Token tidak ditemukan! Silakan login ulang.");
+                window.location.href = "/login";
+                return;
+            }
+
+            try {
+                const response = await fetch(`/tasks/${taskId}`, {
+                    method: "PUT",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ title, category, deadline, status }),
+                    credentials: "include"
+                });
+
+                if (!response.ok) {
+                    const errorResponse = await response.json();
+                    throw new Error(errorResponse.message || "Gagal mengupdate tugas.");
+                }
+
+                $("#editTaskModal").modal("hide");
+                fetchTasks();
+            } catch (error) {
+                console.error("Gagal mengupdate tugas:", error);
+                alert(error.message);
+            }
+        });
+
+        $(document).on("click", ".deleteTaskBtn", function () {
+            const taskId = $(this).data("id");
+            $("#deleteTaskId").val(taskId);
+            $("#deleteTaskModal").modal("show");
+        });
+
+        $("#confirmDeleteBtn").click(async () => {
+            const taskId = $("#deleteTaskId").val();
+
+            const token = document.cookie
+                .split("; ")
+                .find(row => row.startsWith("token="))
+                ?.split("=")[1];
+
+            if (!token) {
+                alert("Token tidak ditemukan! Silakan login ulang.");
+                window.location.href = "/login";
+                return;
+            }
+
+            try {
+                const response = await fetch(`/tasks/${taskId}`, {
+                    method: "DELETE",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                    },
+                    credentials: "include"
+                });
+
+                if (!response.ok) {
+                    const errorResponse = await response.json();
+                    throw new Error(errorResponse.message || "Gagal menghapus tugas.");
+                }
+
+                $("#deleteTaskModal").modal("hide");
+                fetchTasks();
+            } catch (error) {
+                console.error("Gagal menghapus tugas:", error);
+                alert(error.message);
+            }
+        });
+
+        $("#logoutBtn").click(async () => {
+            try {
+                await fetch("/auth/logout", {
+                    method: "POST",
+                    credentials: "include",
+                });
+
+                window.location.href = "/login";
+            } catch (error) {
+                console.error("Gagal logout:", error);
+            }
+        });
+
+        $(document).ready(() => {
+            fetchTasks();
+        });
+    </script>
+</body>
+
+</html>
