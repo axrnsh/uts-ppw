@@ -1,20 +1,26 @@
 const express = require("express");
 const { connectDB, closeDB } = require("./config/database");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 
 const authRoutes = require("./routes/authRoutes");
 const taskRoutes = require("./routes/taskRoutes");
+const viewRoutes = require("./routes/viewRoutes");
 
 require("dotenv").config();
 
 const app = express();
+
 const PORT = process.env.PORT || 5000;
 
+app.set("view engine", "ejs");
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 
 app.use("/auth", authRoutes);
 app.use("/tasks", taskRoutes);
+app.use("/", viewRoutes);
 
 connectDB().then(() => {
   app.listen(PORT, () => {

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+
+<body>
+    <h1>Login</h1>
+    <form id="loginForm">
+        <label>Email:</label>
+        <input type="email" id="email" required><br>
+        <label>Password:</label>
+        <input type="password" id="password" required><br>
+        <button type="submit">Login</button>
+    </form>
+
+    <script>
+        $("#loginForm").submit(async function (event) {
+            event.preventDefault();
+
+            const email = $("#email").val();
+            const password = $("#password").val();
+
+            try {
+                const response = await fetch("http://localhost:5000/auth/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email, password }),
+                });
+
+                if (!response.ok) {
+                    throw new Error("Gagal login. Periksa email dan password.");
+                }
+
+                const result = await response.json();
+
+                document.cookie = `token=${result.token}; path=/; SameSite=Lax`;
+
+                console.log("Login sukses! Token disimpan:", result.token);
+                window.location.href = "/";
+            } catch (error) {
+                console.error("Error saat login:", error);
+                alert(error.message);
+            }
+        });
+    </script>
+</body>
+
+</html>
