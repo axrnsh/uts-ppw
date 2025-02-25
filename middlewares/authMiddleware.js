@@ -11,6 +11,11 @@ function authMiddleware(req, res, next) {
         }
     }
 
+    if (!token) {
+        console.log("Tidak ada token! Akses ditolak.");
+        return res.redirect("/login");
+    }
+
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = decoded;
