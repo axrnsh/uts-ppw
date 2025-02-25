@@ -47,4 +47,9 @@ async function login(req, res) {
     res.json({ message: "Login berhasil!", token });
 }
 
-module.exports = { register, login };
+async function logout(req, res) {
+    res.clearCookie("token");
+    res.json({ message: "Logout berhasil!" });
+}
+
+module.exports = { register, login, logout };
