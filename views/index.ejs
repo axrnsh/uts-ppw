@@ -152,12 +152,14 @@
     </div>
 
     <script>
+        // Filter Tugas berdasarkan kategori dan status
         $("#categoryFilter, #statusFilter").change(() => {
             const selectedCategory = $("#categoryFilter").val();
             const selectedStatus = $("#statusFilter").val();
             fetchTasks(selectedCategory, selectedStatus);
         });
 
+        // Ambil data tugas berdasarkan kategori dan status, defaultnya semua
         async function fetchTasks(category = "", status = "") {
             try {
                 let url = "/tasks";
@@ -173,14 +175,15 @@
                 const response = await fetch(url, { method: "GET", credentials: "include" });
                 const tasks = await response.json();
 
+                // Buat urutkan berdasarkan deadline
                 tasks.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
 
                 $("#taskTable").empty();
 
                 if (tasks.length === 0) {
-                    $("#noDataMessage").show();
+                    $("#noDataMessage").show(); // Tampilkan pesan jika tidak ada data
                 } else {
-                    $("#noDataMessage").hide();
+                    $("#noDataMessage").hide(); // Sembunyikan pesan jika ada data
                     tasks.forEach((task, index) => {
                         $("#taskTable").append(`
                     <tr>
@@ -206,6 +209,7 @@
             }
         }
 
+        // Format tanggal dari string ke format tanggal Indonesia
         function formatDate(dateString) {
             const date = new Date(dateString);
             return date.toLocaleDateString("id-ID", {
@@ -215,13 +219,14 @@
             });
         }
 
-
+        // Tambahkan tugas baru
         $("#addTaskBtn").click(async () => {
             const title = $("#taskTitle").val();
             const category = $("#taskCategory").val();
             const deadline = $("#taskDeadline").val();
             const status = $("#taskStatus").val();
 
+            // Validasi dari front end
             if (!title || !category || !deadline || !status) {
                 alert("Harap isi semua field!");
                 return;
@@ -254,18 +259,21 @@
                     throw new Error(errorResponse.message || "Gagal menambahkan tugas.");
                 }
 
+                // Tutup modal dan reset form
                 $("#addTaskModal").modal("hide");
                 $("#taskTitle").val("");
                 $("#taskCategory").val("Kuliah");
                 $("#taskDeadline").val("");
                 $("#taskStatus").val("Belum Selesai");
 
+                // Ambil ulang data tugas terbaru
                 fetchTasks();
             } catch (error) {
                 console.error(error);
             }
         });
 
+        // Edit tugas
         $(document).on("click", ".editTaskBtn", async function () {
             const taskId = $(this).data("id");
 
@@ -293,6 +301,7 @@
             }
         });
 
+        // Untuk menyimpan perubahan tugas
         $("#editTaskBtn").click(async () => {
             const taskId = $("#editTaskId").val();
             const title = $("#editTaskTitle").val();
@@ -332,19 +341,24 @@
                     throw new Error(errorResponse.message || "Gagal mengupdate tugas.");
                 }
 
+                // Tutup modal dan reset form
                 $("#editTaskModal").modal("hide");
+
+                // Ambil ulang data tugas terbaru
                 fetchTasks();
             } catch (error) {
                 console.error("Gagal mengupdate tugas:", error);
             }
         });
 
+        // Hapus tugas
         $(document).on("click", ".deleteTaskBtn", function () {
             const taskId = $(this).data("id");
             $("#deleteTaskId").val(taskId);
             $("#deleteTaskModal").modal("show");
         });
 
+        // Konfirmasi hapus tugas
         $("#confirmDeleteBtn").click(async () => {
             const taskId = $("#deleteTaskId").val();
 
@@ -373,6 +387,7 @@
                     throw new Error(errorResponse.message || "Gagal menghapus tugas.");
                 }
 
+                // Tutup modal dan ambil ulang data tugas terbaru
                 $("#deleteTaskModal").modal("hide");
                 fetchTasks();
             } catch (error) {
@@ -380,6 +395,7 @@
             }
         });
 
+        // Logout
         $("#logoutBtn").click(async () => {
             try {
                 await fetch("/auth/logout", {
@@ -393,10 +409,12 @@
             }
         });
 
+        // Ambil data tugas saat halaman dimuat
         $(document).ready(() => {
             fetchTasks();
         });
 
+        // Websocket  untuk menerima pesan real-time saat tugas ditambahkan, diperbarui, atau dihapus
         const socket = new WebSocket(`ws://${window.location.hostname}:5000`);
 
         socket.onmessage = function (event) {
@@ -414,6 +432,7 @@
             }
         };
 
+        // Buat menampilkan toast notif
         function showToast(title, message) {
             const toastHTML = `
         <div class="toast align-items-center text-bg-dark border-0 show fade" role="alert">
@@ -430,6 +449,7 @@
             toastElement.innerHTML = toastHTML;
             toastContainer.appendChild(toastElement);
 
+            // Hapus toast setelah 5 detik
             setTimeout(() => {
                 toastElement.remove();
             }, 5000);

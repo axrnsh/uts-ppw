@@ -44,6 +44,7 @@
     </div>
 
     <script>
+        // Menggunakan jQuery untuk menangani submit form
         $("#registerForm").submit(async function (event) {
             event.preventDefault();
 
@@ -63,6 +64,7 @@
                 }
 
                 const result = await response.json();
+                // Redirect ke halaman login
                 window.location.href = "/login";
             } catch (error) {
                 console.error("Error saat registrasi:", error);

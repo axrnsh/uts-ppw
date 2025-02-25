@@ -3,6 +3,10 @@ const authMiddleware = require("../middlewares/authMiddleware");
 
 const router = express.Router();
 
+// Router untuk view
+// Jika kita akses /register atau /
+// Maka akan diarahkan ke register.ejs atau index.ejs
+
 router.get("/register", (req, res) => {
     res.render("register");
 });

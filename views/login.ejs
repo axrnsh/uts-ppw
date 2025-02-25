@@ -40,6 +40,7 @@
     </div>
 
     <script>
+        // Menggunakan jQuery untuk menangani submit form
         $("#loginForm").submit(async function (event) {
             event.preventDefault();
 
@@ -53,15 +54,18 @@
                     body: JSON.stringify({ email, password }),
                 });
 
+                // Jika status response tidak ok, lempar alias throw error
                 if (!response.ok) {
                     throw new Error("Gagal login. Periksa email dan password.");
                 }
 
                 const result = await response.json();
 
+                // Simpan token ke cookie
                 document.cookie = `token=${result.token}; path=/; SameSite=Lax`;
 
                 console.log("Login sukses! Token disimpan:", result.token);
+                // Redirect ke halaman utama yang isinya tasks
                 window.location.href = "/";
             } catch (error) {
                 console.error("Error saat login:", error);

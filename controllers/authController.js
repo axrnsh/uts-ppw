@@ -47,6 +47,7 @@ async function login(req, res) {
     res.json({ message: "Login berhasil!", token });
 }
 
+// Logout pengguna
 async function logout(req, res) {
     res.clearCookie("token");
     res.json({ message: "Logout berhasil!" });

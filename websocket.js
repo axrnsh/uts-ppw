@@ -2,6 +2,7 @@ const WebSocket = require("ws");
 
 let wss;
 
+// Inisialisasi WebSocket
 function webSocket(server) {
     wss = new WebSocket.Server({ server });
 
@@ -14,6 +15,7 @@ function webSocket(server) {
     });
 }
 
+// Broadcast pesan ke semua client
 function broadcast(message) {
     if (!wss) return;
     wss.clients.forEach((client) => {

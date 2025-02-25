@@ -7,6 +7,7 @@ const dbName = process.env.DB_NAME || "db_task";
 let client;
 let db;
 
+// Untuk connect ke database mongoDB
 async function connectDB() {
   try {
     client = new MongoClient(uri);
@@ -20,6 +21,7 @@ async function connectDB() {
   }
 }
 
+// Untuk mendapatkan koneksi database
 function getDB() {
   if (!db) {
     throw new Error("Database not connected. ");
@@ -27,6 +29,7 @@ function getDB() {
   return db;
 }
 
+// Untuk menutup koneksi database
 async function closeDB() {
   if (client) {
     await client.close();
