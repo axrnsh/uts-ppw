@@ -1,4 +1,5 @@
 const { getDB } = require("../config/database");
+const { ObjectId } = require("mongodb"); // Import ObjectId untuk menangani ID MongoDB
 
 async function createTask(taskData) {
   const db = getDB();
@@ -13,7 +14,7 @@ async function getAllTasks() {
 
 async function getTaskById(id) {
   const db = getDB();
-  return await db.collection("tasks").findOne({ _id: new id });
+  return await db.collection("tasks").findOne({ _id: new ObjectId(id) });
 }
 
 async function updateTask(id, updatedData) {
@@ -26,7 +27,7 @@ async function updateTask(id, updatedData) {
 
 async function deleteTask(id) {
   const db = getDB();
-  return await db.collection("tasks").deleteOne({ _id: new id });
+  return await db.collection("tasks").deleteOne({ _id: new ObjectId(id) }); 
 }
 
 module.exports = {

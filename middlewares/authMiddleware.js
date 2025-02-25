@@ -2,11 +2,13 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 function authMiddleware(req, res, next) {
-    const token = req.cookies.token;
+    let token = req.cookies.token; 
 
-    if (!token) {
-        console.log("Tidak ada token, redirect ke login...");
-        return res.redirect("/login");
+    if (!token && req.headers.authorization) {
+        const authHeader = req.headers.authorization;
+        if (authHeader.startsWith("Bearer ")) {
+            token = authHeader.split(" ")[1]; 
+        }
     }
 
     try {
