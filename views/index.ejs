@@ -68,6 +68,8 @@
         <div id="noDataMessage" class="text-center text-muted mt-3" style="display: none;">
             <i class="bi bi-info-circle"></i> Tidak ada data.
         </div>
+
+        <div id="toastContainer" class="position-fixed bottom-0 end-0 p-3" style="z-index: 1050;"></div>
     </main>
 
     <!-- Modal Tambah Tugas -->
@@ -384,6 +386,44 @@
         $(document).ready(() => {
             fetchTasks();
         });
+        
+        const socket = new WebSocket(`ws://${window.location.hostname}:5000`);
+
+        socket.onmessage = function (event) {
+            const message = JSON.parse(event.data);
+
+            if (message.type === "NEW_TASK") {
+                showToast("✅ Tugas Baru", `Tugas "${message.data.title}" telah ditambahkan.`);
+                fetchTasks();
+            } else if (message.type === "EDIT_TASK") {
+                showToast("✏️ Tugas Diperbarui", `Tugas "${message.data.title}" telah diperbarui.`);
+                fetchTasks();
+            } else if (message.type === "DELETE_TASK") {
+                showToast("🗑️ Tugas Dihapus", "Sebuah tugas telah dihapus.");
+                fetchTasks();
+            }
+        };
+
+        function showToast(title, message) {
+            const toastHTML = `
+        <div class="toast align-items-center text-bg-dark border-0 show fade" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <strong>${title}</strong><br>${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>`;
+
+            const toastContainer = document.getElementById("toastContainer");
+            const toastElement = document.createElement("div");
+            toastElement.innerHTML = toastHTML;
+            toastContainer.appendChild(toastElement);
+
+            setTimeout(() => {
+                toastElement.remove();
+            }, 5000);
+        }
     </script>
 </body>
 

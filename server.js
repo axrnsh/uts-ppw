@@ -2,6 +2,8 @@ const express = require("express");
 const { connectDB, closeDB } = require("./config/database");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const http = require("http");
+const { webSocket } = require("./websocket");
 
 const authRoutes = require("./routes/authRoutes");
 const taskRoutes = require("./routes/taskRoutes");
@@ -17,13 +19,17 @@ app.set("view engine", "ejs");
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
+app.use(express.static("public"));
 
 app.use("/auth", authRoutes);
 app.use("/tasks", taskRoutes);
 app.use("/", viewRoutes);
 
+const server = http.createServer(app);
+webSocket(server);
+
 connectDB().then(() => {
-  app.listen(PORT, () => {
+  server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
     console.log(`http://localhost:${PORT}`);
   });
