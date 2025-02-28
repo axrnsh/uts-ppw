@@ -1,5 +1,6 @@
 const express = require("express");
 const authMiddleware = require("../middlewares/authMiddleware");
+const { ObjectId } = require("mongodb");
 
 const router = express.Router();
 
@@ -18,7 +19,8 @@ router.get("/login", (req, res) => {
 router.get("/", authMiddleware, async (req, res) => {
     const db = require("../config/database").getDB();
     const tasks = await db.collection("tasks").find().toArray();
-    res.render("index", { tasks });
+    const user = await db.collection("users").findOne({ _id: new ObjectId(req.user.id) });
+    res.render("index", { tasks, user });
 });
 
 module.exports = router;

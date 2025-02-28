@@ -16,6 +16,7 @@
     <aside class="d-flex flex-column p-3 text-white bg-white position-fixed shadow"
         style="width: 250px; height: 100vh;">
         <div class="d-flex flex-column justify-content-center align-items-center flex-grow-1">
+            <h4 class="text-black">Hai, <%= user ? user.name : "User" %></h2>
             <img src="https://i.imgur.com/xsP5nq7.png" alt="User Image" class="img-fluid" style="width: 200px;">
             <button class="btn btn-dark w-100 shadow-sm fw-bold mt-3 text-white" data-bs-toggle="modal"
                 data-bs-target="#addTaskModal">
