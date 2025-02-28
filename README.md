@@ -44,21 +44,14 @@
 
 ---
 
-### **5. Kekurangan**
-❌ **Task Tidak Berbasis User**  
-   - Saat ini semua tugas tersimpan secara global di database.  
-   - Akan diperbaiki jika memungkinkan
-
----
-
-### **6. Tech stack**
+### **5. Tech stack**
 - **Backend**: Node.js, Express.js, MongoDB, WebSocket  
 - **Frontend**: EJS, Bootstrap, jQuery  
 - **Autentikasi**: JWT (JSON Web Token)  
 
 ---
 
-### **7. API endpoints**
+### **6. API endpoints**
 | Method | Endpoint         | Deskripsi                 |
 |--------|-----------------|---------------------------|
 | POST   | `/auth/register` | Register pengguna        |

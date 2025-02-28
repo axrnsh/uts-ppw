@@ -4,8 +4,9 @@ const { broadcast } = require("../websocket");
 // Tambah tugas baru
 async function addTask(req, res) {
     try {
-        const { title, category, deadline } = req.body;
-        const newTask = { title, category, deadline, status: "Belum Selesai" };
+        const { title, category, deadline, status } = req.body;
+        const user_id = req.user.id;
+        const newTask = { title, category, deadline, status, user_id };
         const task_id = await createTask(newTask);
 
         newTask._id = task_id; // Tambahkan ID tugas
@@ -21,7 +22,7 @@ async function addTask(req, res) {
 async function getTasks(req, res) {
     try {
         const { category, status } = req.query;
-        let filter = {};
+        let filter = { user_id: req.user.id };
 
         if (category) {
             filter.category = category;
@@ -55,11 +56,16 @@ async function getTask(req, res) {
 async function editTask(req, res) {
     try {
         const { title, category, deadline, status } = req.body;
-        const updated = await updateTask(req.params.id, { title, category, deadline, status });
+        const task = await getTaskById(req.params.id);
 
-        if (!updated) {
+        if (!task) {
             return res.status(404).json({ message: "Tugas tidak ditemukan!" });
         }
+        if (task.user_id !== req.user.id) {
+            return res.status(403).json({ message: "Akses ditolak!" });
+        }
+
+        await updateTask(req.params.id, { title, category, deadline, status });
 
         broadcast({ type: "EDIT_TASK", data: { _id: req.params.id, title, category, deadline, status } });
         res.json({ message: "Tugas berhasil diperbarui!" });
@@ -71,11 +77,16 @@ async function editTask(req, res) {
 // Hapus tugas
 async function removeTask(req, res) {
     try {
-        const deleted = await deleteTask(req.params.id);
-        if (!deleted) {
+        const task = await getTaskById(req.params.id);
+
+        if (!task) {
             return res.status(404).json({ message: "Tugas tidak ditemukan!" });
         }
+        if (task.user_id !== req.user.id) {
+            return res.status(403).json({ message: "Akses ditolak!" });
+        }
 
+        await deleteTask(req.params.id);
         broadcast({ type: "DELETE_TASK", data: { _id: req.params.id } });
         res.json({ message: "Tugas berhasil dihapus!" });
     } catch (err) {
